@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Panel | QuickTow</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/driver/panel" class="navbar-brand">
+                <span class="logo-icon">🚛</span>
+                QuickTow Driver
+            </a>
+            <div class="navbar-links">
+                <span style="color: rgba(255,255,255,0.9); padding: 10px 16px; background: rgba(255,255,255,0.1); border-radius: 10px; font-weight: 500;">👨‍✈️ <%= driverName %></span>
+                <a href="/driver/logout" class="cta" style="background: linear-gradient(135deg, var(--danger), #c0392b);">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="driver-panel-header">
+        <h1>👨‍✈️ Welcome, <%= driverName %>!</h1>
+        <p>Manage your assigned bookings and update status in real-time</p>
+    </div>
+
+    <div class="container">
+        <% if(bookings.length === 0 && completed.length === 0) { %>
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No Bookings Assigned</h3>
+                <p>You have no active bookings right now. Check back later or contact admin.</p>
+            </div>
+        <% } %>
+
+        <% if(bookings.length > 0) { %>
+            <h2 style="margin-bottom: 1.5rem; font-weight: 800;">🚛 Active Bookings (<%= bookings.length %>)</h2>
+            <% bookings.forEach(function(b, index) { %>
+                <div class="dash-section" style="margin-bottom: 2rem; animation: fadeInUp <%= 0.3 + index * 0.1 %>s ease;" id="booking-<%= b.id %>">
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h3 style="border: none; padding: 0; margin-bottom: 0.75rem; font-size: 1.25rem;"><%= b.customer_name %></h3>
+                            <p style="color: var(--text-light); margin-bottom: 4px;">📞 <%= b.phone %> | 🚗 <%= b.car_model %></p>
+                            <p style="color: var(--text-light); margin-bottom: 4px;">📍 Pickup: <strong style="color: var(--text);"><%= b.pickup_location %></strong></p>
+                            <p style="color: var(--text-light);">🏁 Dropoff: <strong style="color: var(--text);"><%= b.dropoff_location %></strong></p>
+                            <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span class="badge badge-<%= b.status %>"><%= b.status.replaceAll('_', ' ').toUpperCase() %></span>
+                                <span class="badge badge-assigned"><%= b.service_type %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="map-<%= b.id %>" style="height: 280px; border-radius: 12px; margin: 1.25rem 0; background: linear-gradient(135deg, #e1e5e9, #d1d5db);"></div>
+
+                    <div class="driver-actions-section">
+                        <div class="booking-actions">
+                            <% if(b.status === 'assigned') { %>
+                                <button class="btn btn-primary btn-sm" onclick="updateStatus(<%= b.id %>, 'dispatched', this)">🚛 Start Dispatch</button>
+                            <% } %>
+                            <% if(b.status === 'dispatched') { %>
+                                <button class="btn btn-primary btn-sm" onclick="updateStatus(<%= b.id %>, 'on_the_way', this)">🛣️ On The Way</button>
+                            <% } %>
+                            <% if(b.status === 'on_the_way') { %>
+                                <button class="btn btn-success btn-sm" onclick="updateStatus(<%= b.id %>, 'arrived', this)">📍 Arrived at Pickup</button>
+                            <% } %>
+                            <% if(b.status === 'arrived') { %>
+                                <button class="btn btn-success btn-sm" onclick="updateStatus(<%= b.id %>, 'completed', this)">✅ Complete Delivery</button>
+                            <% } %>
+                            <button class="btn btn-info btn-sm" onclick="shareLocation(<%= b.id %>, this)">📍 Share My Location</button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if(completed.length > 0) { %>
+            <h2 style="margin: 2.5rem 0 1.5rem; font-weight: 800;">✅ Recent Completed (<%= completed.length %>)</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Pickup</th>
+                            <th>Dropoff</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% completed.forEach(function(b) { %>
+                            <tr>
+                                <td><strong><%= b.customer_name %></strong></td>
+                                <td><%= b.car_model %></td>
+                                <td><%= b.pickup_location %></td>
+                                <td><%= b.dropoff_location %></td>
+                                <td><span class="badge badge-completed"><%= b.service_type %></span></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 QuickTow. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var lastKnownLat = null;
+        var lastKnownLng = null;
+
+        <% bookings.forEach(function(b) { %>
+            (function() {
+                var mapEl = document.getElementById('map-<%= b.id %>');
+                if (mapEl) {
+                    var initLat = <%= b.pickup_lat || '33.6844' %>;
+                    var initLng = <%= b.pickup_lng || '73.0479' %>;
+                    var map = L.map('map-<%= b.id %>').setView([initLat, initLng], 12);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap'
+                    }).addTo(map);
+
+                    L.marker([initLat, initLng]).addTo(map).bindPopup('📍 Pickup: <%= b.pickup_location %>');
+                    
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(pos) {
+                            lastKnownLat = pos.coords.latitude;
+                            lastKnownLng = pos.coords.longitude;
+                            map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+                            L.marker([pos.coords.latitude, pos.coords.longitude]).addTo(map)
+                                .bindPopup('📍 Your Current Location')
+                                .openPopup();
+                        }, function(err) {
+                            console.log('Geolocation not available, using default');
+                        });
+                    }
+                }
+            })();
+        <% }) %>
+
+        async function updateStatus(bookingId, status, btnElement) {
+            // Show loading state
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = '⏳ Updating...';
+            btnElement.disabled = true;
+            
+            try {
+                const res = await fetch('/driver/update-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        booking_id: bookingId, 
+                        status: status,
+                        lat: lastKnownLat,
+                        lng: lastKnownLng
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating status: ' + (data.error || 'Unknown error'));
+                    btnElement.innerHTML = originalText;
+                    btnElement.disabled = false;
+                }
+            } catch (err) {
+                alert('Error updating status. Please try again.');
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+            }
+        }
+
+        async function shareLocation(bookingId, btnElement) {
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = '⏳ Sharing...';
+            btnElement.disabled = true;
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                        await fetch('/driver/update-location', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                lat: pos.coords.latitude, 
+                                lng: pos.coords.longitude 
+                            })
+                        });
+                        btnElement.innerHTML = '✅ Location Shared!';
+                        setTimeout(() => {
+                            btnElement.innerHTML = originalText;
+                            btnElement.disabled = false;
+                        }, 2000);
+                    } catch (err) {
+                        alert('Error sharing location. Please try again.');
+                        btnElement.innerHTML = originalText;
+                        btnElement.disabled = false;
+                    }
+                }, (err) => {
+                    alert('Unable to get your location. Please enable GPS.');
+                    btnElement.innerHTML = originalText;
+                    btnElement.disabled = false;
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+            }
+        }
+    </script>
+
+</body>
+</html>

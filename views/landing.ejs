@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickTow - 24/7 Emergency Towing Service</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <% if (lang === 'ur') { %>
+    <style>body { direction: rtl; text-align: right; } .navbar-brand { flex-direction: row-reverse; } .navbar-links { flex-direction: row-reverse; } .tracking-search { flex-direction: row-reverse; }</style>
+    <% } %>
+    <style>
+        .lp-hero {
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 50%, #1a252f 100%);
+            color: white;
+            padding: 6rem 2rem 8rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+        }
+        .lp-hero::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(243,156,18,0.12) 0%, transparent 70%);
+            top: -200px; right: -100px;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .lp-hero::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(39,174,96,0.1) 0%, transparent 70%);
+            bottom: -100px; left: -100px;
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        .lp-hero-content { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+        .lp-hero h1 { font-size: 3.8rem; font-weight: 900; margin-bottom: 1.5rem; letter-spacing: -2px; line-height: 1.15; animation: fadeInUp 0.6s ease; }
+        .lp-hero h1 span { color: var(--primary); }
+        .lp-hero p { font-size: 1.3rem; color: rgba(255,255,255,0.8); margin-bottom: 2.5rem; line-height: 1.8; animation: fadeInUp 0.8s ease; }
+        .lp-hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; animation: fadeInUp 1s ease; }
+        .lp-hero-btns .btn { padding: 18px 40px; font-size: 1.1rem; border-radius: 14px; }
+        .lp-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 10px 24px; border-radius: 50px; margin-bottom: 2rem; font-size: 0.95rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.15); animation: fadeIn 0.5s ease; }
+        .lp-hero-badge .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+
+        .section { padding: 6rem 2rem; }
+        .section-title { text-align: center; margin-bottom: 4rem; }
+        .section-title .tag { display: inline-block; background: rgba(243,156,18,0.1); color: var(--primary); padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem; }
+        .section-title h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; }
+        .section-title p { color: var(--text-light); font-size: 1.15rem; max-width: 600px; margin: 0 auto; }
+
+        .lp-services { background: var(--bg); }
+        .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+        .service-card { background: white; border-radius: 20px; padding: 2.5rem; text-align: center; box-shadow: var(--shadow); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
+        .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--accent)); transform: scaleX(0); transition: all 0.4s ease; }
+        .service-card:hover::before { transform: scaleX(1); }
+        .service-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-xl); }
+        .service-icon { width: 80px; height: 80px; background: linear-gradient(135deg, rgba(243,156,18,0.1), rgba(243,156,18,0.2)); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; transition: all 0.4s ease; }
+        .service-card:hover .service-icon { transform: scale(1.1) rotate(5deg); background: linear-gradient(135deg, var(--primary), var(--primary-dark)); box-shadow: 0 8px 25px rgba(243,156,18,0.3); }
+        .service-card h3 { font-size: 1.3rem; margin-bottom: 0.75rem; font-weight: 700; }
+        .service-card p { color: var(--text-light); line-height: 1.7; font-size: 1rem; }
+
+        .lp-how { background: white; }
+        .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; max-width: 1100px; margin: 0 auto; position: relative; }
+        .how-grid::before { content: ''; position: absolute; top: 45px; left: 15%; right: 15%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent)); z-index: 0; }
+        .how-step { text-align: center; position: relative; z-index: 1; }
+        .how-num { width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; margin: 0 auto 1.5rem; box-shadow: 0 8px 30px rgba(243,156,18,0.3); transition: all 0.4s ease; }
+        .how-step:hover .how-num { transform: scale(1.15); box-shadow: 0 12px 40px rgba(243,156,18,0.4); }
+        .how-step h3 { font-size: 1.15rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .how-step p { color: var(--text-light); font-size: 0.95rem; line-height: 1.6; }
+
+        .lp-stats { background: linear-gradient(135deg, var(--secondary), #34495e); color: white; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; max-width: 1000px; margin: 0 auto; }
+        .stat-item { text-align: center; padding: 2rem; }
+        .stat-num { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 0.5rem; }
+        .stat-label { font-size: 1.05rem; color: rgba(255,255,255,0.8); font-weight: 500; }
+
+        .lp-why { background: var(--bg); }
+        .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 1000px; margin: 0 auto; }
+        .why-card { display: flex; align-items: flex-start; gap: 1.25rem; background: white; border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); transition: all 0.3s ease; }
+        .why-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .why-icon { width: 55px; height: 55px; background: linear-gradient(135deg, rgba(243,156,18,0.1), rgba(243,156,18,0.2)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; transition: all 0.3s ease; }
+        .why-card:hover .why-icon { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .why-card h3 { font-size: 1.1rem; margin-bottom: 0.4rem; font-weight: 700; }
+        .why-card p { color: var(--text-light); font-size: 0.95rem; line-height: 1.6; }
+
+        .lp-cta { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; text-align: center; padding: 5rem 2rem; position: relative; overflow: hidden; }
+        .lp-cta::before { content: ''; position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); top: -200px; right: -100px; border-radius: 50%; }
+        .lp-cta h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; position: relative; }
+        .lp-cta p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; position: relative; }
+        .lp-cta .btn { background: white; color: var(--primary-dark); font-size: 1.15rem; padding: 18px 45px; border-radius: 14px; position: relative; }
+        .lp-cta .btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+
+        .lp-testimonials { background: white; }
+        .testimonial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+        .testimonial-card { background: var(--bg); border-radius: 20px; padding: 2rem; position: relative; transition: all 0.3s ease; }
+        .testimonial-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .testimonial-card .stars { color: #f1c40f; font-size: 1.1rem; margin-bottom: 1rem; }
+        .testimonial-card p { color: var(--text); font-size: 1rem; line-height: 1.7; margin-bottom: 1.5rem; font-style: italic; }
+        .testimonial-author { display: flex; align-items: center; gap: 12px; }
+        .testimonial-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; }
+        .testimonial-name { font-weight: 700; font-size: 0.95rem; }
+        .testimonial-role { font-size: 0.85rem; color: var(--text-light); }
+
+        .lp-footer-links { background: var(--secondary); color: white; padding: 4rem 2rem 2rem; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; max-width: 1100px; margin: 0 auto; }
+        .footer-brand h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem; }
+        .footer-brand p { color: rgba(255,255,255,0.7); line-height: 1.7; font-size: 0.95rem; }
+        .footer-col h4 { font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--primary); }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col ul li a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.95rem; transition: all 0.3s ease; }
+        .footer-col ul li a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 3rem; padding-top: 2rem; text-align: center; color: rgba(255,255,255,0.5); font-size: 0.9rem; }
+
+        @media (max-width: 992px) {
+            .services-grid, .testimonial-grid { grid-template-columns: 1fr 1fr; }
+            .how-grid { grid-template-columns: 1fr 1fr; }
+            .how-grid::before { display: none; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .lp-hero h1 { font-size: 2.5rem; }
+            .lp-hero { padding: 4rem 1.5rem 6rem; min-height: auto; }
+            .services-grid, .testimonial-grid, .why-grid { grid-template-columns: 1fr; }
+            .how-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .section-title h2 { font-size: 1.8rem; }
+            .lp-cta h2 { font-size: 1.8rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<a href="?lang=<%= langSwitch %>" class="lang-btn" style="position:fixed;top:90px;right:25px;z-index:9999;background:linear-gradient(135deg,#f39c12,#e67e22);color:white;border:3px solid white;padding:12px 24px;border-radius:50px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,0.3);transition:all 0.3s ease;text-decoration:none;display:flex;align-items:center;gap:8px;">🌐 <%= lang === 'en' ? 'اردو' : 'English' %></a>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <span class="logo-icon">🚛</span>
+                QuickTow
+            </a>
+            <div class="navbar-links">
+                <a href="/" class="active"><%= t.nav.home %></a>
+                <a href="/booking"><%= t.nav.booking %></a>
+                <a href="/track"><%= t.nav.track %></a>
+                <a href="/blogs"><%= t.nav.blogs %></a>
+                <a href="/about"><%= t.nav.about %></a>
+                <a href="/booking" class="cta"><%= t.nav.emergency %></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="lp-hero">
+        <div class="lp-hero-content">
+            <div class="lp-hero-badge">
+                <span class="dot"></span>
+                <%= t.hero.badge %>
+            </div>
+            <h1><%= t.hero.title1 %><br><%= t.hero.title2 %> <span><%= t.hero.title3 %></span></h1>
+            <p><%= t.hero.subtitle %></p>
+            <div class="lp-hero-btns">
+                <a href="/booking" class="btn btn-primary"><%= t.hero.cta1 %></a>
+                <a href="/track" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);"><%= t.hero.cta2 %></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section lp-services">
+        <div class="section-title">
+            <div class="tag"><%= t.services.tag %></div>
+            <h2><%= t.services.title %></h2>
+            <p><%= t.services.subtitle %></p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🚛</div>
+                <h3><%= t.services.standard.name %></h3>
+                <p><%= t.services.standard.desc %></p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🚗</div>
+                <h3><%= t.services.flatbed.name %></h3>
+                <p><%= t.services.flatbed.desc %></p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🚑</div>
+                <h3><%= t.services.accident.name %></h3>
+                <p><%= t.services.accident.desc %></p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔋</div>
+                <h3><%= t.services.battery.name %></h3>
+                <p><%= t.services.battery.desc %></p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⛽</div>
+                <h3><%= t.services.fuel.name %></h3>
+                <p><%= t.services.fuel.desc %></p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔧</div>
+                <h3><%= t.services.repair.name %></h3>
+                <p><%= t.services.repair.desc %></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section lp-how">
+        <div class="section-title">
+            <div class="tag"><%= t.how.tag %></div>
+            <h2><%= t.how.title %></h2>
+            <p><%= t.how.subtitle %></p>
+        </div>
+        <div class="how-grid">
+            <div class="how-step">
+                <div class="how-num">1</div>
+                <h3><%= t.how.step1.title %></h3>
+                <p><%= t.how.step1.desc %></p>
+            </div>
+            <div class="how-step">
+                <div class="how-num">2</div>
+                <h3><%= t.how.step2.title %></h3>
+                <p><%= t.how.step2.desc %></p>
+            </div>
+            <div class="how-step">
+                <div class="how-num">3</div>
+                <h3><%= t.how.step3.title %></h3>
+                <p><%= t.how.step3.desc %></p>
+            </div>
+            <div class="how-step">
+                <div class="how-num">4</div>
+                <h3><%= t.how.step4.title %></h3>
+                <p><%= t.how.step4.desc %></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="section lp-stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-num">5000+</div>
+                <div class="stat-label"><%= t.stats.vehicles %></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">30 min</div>
+                <div class="stat-label"><%= t.stats.response %></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">24/7</div>
+                <div class="stat-label"><%= t.stats.available %></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">98%</div>
+                <div class="stat-label"><%= t.stats.satisfaction %></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY CHOOSE US -->
+    <section class="section lp-why">
+        <div class="section-title">
+            <div class="tag"><%= t.why.tag %></div>
+            <h2><%= t.why.title %></h2>
+            <p><%= t.why.subtitle %></p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon">⚡</div>
+                <div>
+                    <h3><%= t.why.fast.title %></h3>
+                    <p><%= t.why.fast.desc %></p>
+                </div>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">💰</div>
+                <div>
+                    <h3><%= t.why.price.title %></h3>
+                    <p><%= t.why.price.desc %></p>
+                </div>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">🛡️</div>
+                <div>
+                    <h3><%= t.why.insured.title %></h3>
+                    <p><%= t.why.insured.desc %></p>
+                </div>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">📍</div>
+                <div>
+                    <h3><%= t.why.tracking.title %></h3>
+                    <p><%= t.why.tracking.desc %></p>
+                </div>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">👨‍✈️</div>
+                <div>
+                    <h3><%= t.why.drivers.title %></h3>
+                    <p><%= t.why.drivers.desc %></p>
+                </div>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">🕐</div>
+                <div>
+                    <h3><%= t.why.available247.title %></h3>
+                    <p><%= t.why.available247.desc %></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section lp-testimonials">
+        <div class="section-title">
+            <div class="tag"><%= t.testimonials.tag %></div>
+            <h2><%= t.testimonials.title %></h2>
+            <p><%= t.testimonials.subtitle %></p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p><%= t.testimonials.review1 %></p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">A</div>
+                    <div>
+                        <div class="testimonial-name"><%= t.testimonials.name1 %></div>
+                        <div class="testimonial-role"><%= t.testimonials.city1 %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p><%= t.testimonials.review2 %></p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">S</div>
+                    <div>
+                        <div class="testimonial-name"><%= t.testimonials.name2 %></div>
+                        <div class="testimonial-role"><%= t.testimonials.city2 %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p><%= t.testimonials.review3 %></p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">M</div>
+                    <div>
+                        <div class="testimonial-name"><%= t.testimonials.name3 %></div>
+                        <div class="testimonial-role"><%= t.testimonials.city3 %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="lp-cta">
+        <h2><%= t.cta.title %></h2>
+        <p><%= t.cta.subtitle %></p>
+        <a href="/booking" class="btn"><%= t.cta.button %></a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="lp-footer-links">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>🚛 QuickTow</h3>
+                <p><%= t.footer.brand_desc %></p>
+            </div>
+            <div class="footer-col">
+                <h4><%= t.footer.quick_links %></h4>
+                <ul>
+                    <li><a href="/"><%= t.nav.home %></a></li>
+                    <li><a href="/booking"><%= t.nav.booking %></a></li>
+                    <li><a href="/track"><%= t.nav.track %></a></li>
+                    <li><a href="/blogs"><%= t.nav.blogs %></a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4><%= t.footer.services %></h4>
+                <ul>
+                    <li><a href="/booking"><%= t.services.standard.name %></a></li>
+                    <li><a href="/booking"><%= t.services.flatbed.name %></a></li>
+                    <li><a href="/booking"><%= t.services.accident.name %></a></li>
+                    <li><a href="/booking"><%= t.nav.emergency %></a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4><%= t.footer.contact %></h4>
+                <ul>
+                    <li><a href="tel:+923000000000">📞 0300-0000000</a></li>
+                    <li><a href="https://wa.me/923000000000">💬 WhatsApp</a></li>
+                    <li><a href="/about"><%= t.nav.about %></a></li>
+                    <li><a href="/driver"><%= t.nav.driver_login %></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <%= t.footer.copyright %></p>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/923000000000?text=Hello%20QuickTow,%20I%20need%20immediate%20assistance." class="wa-float" target="_blank">
+        💬 WhatsApp
+    </a>
+
+</body>
+</html>

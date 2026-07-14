@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | QuickTow</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-icon">🔐</div>
+            <h2>Admin Console</h2>
+            <p class="subtitle">Sign in to access the management panel</p>
+
+            <% if(error) { %> 
+                <div class="alert alert-error">
+                    ⚠️ <%= error %>
+                </div>
+            <% } %>
+
+            <form action="/<%= adminPath %>/login" method="POST" id="adminLoginForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-block btn-lg" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+
+            <p style="margin-top: 2rem; color: var(--text-light); font-size: 0.95rem;">
+                <a href="/driver" style="color: var(--text-light); text-decoration: none; font-weight: 500;">👨‍✈️ Driver Login</a> <span style="margin: 0 8px;">|</span>
+                <a href="/" style="color: var(--text-light); text-decoration: none; font-weight: 500;">🏠 Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '⏳ Signing in...';
+            btn.disabled = true;
+        });
+    </script>
+
+</body>
+</html>

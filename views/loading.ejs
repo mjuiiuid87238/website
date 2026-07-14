@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickTow | Loading</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <% if (lang === 'ur') { %>
+    <style>body { direction: rtl; text-align: right; } .navbar-brand { flex-direction: row-reverse; } .navbar-links { flex-direction: row-reverse; } .tracking-search { flex-direction: row-reverse; }</style>
+    <% } %>
+</head>
+<body>
+    <div class="loading-screen">
+        <div class="loading-logo">🚛</div>
+        <div class="spinner"></div>
+        <h2><%= t.loading.title %></h2>
+        <p><%= t.loading.subtitle %></p>
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => { 
+            window.location.href = '/booking'; 
+        }, 3000);
+    </script>
+</body>
+</html>

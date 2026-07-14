@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Order | QuickTow</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <% if (lang === 'ur') { %>
+    <style>body { direction: rtl; text-align: right; } .navbar-brand { flex-direction: row-reverse; } .navbar-links { flex-direction: row-reverse; } .tracking-search { flex-direction: row-reverse; }</style>
+    <% } %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+<a href="?lang=<%= langSwitch %>" class="lang-btn" style="position:fixed;top:90px;right:25px;z-index:9999;background:linear-gradient(135deg,#f39c12,#e67e22);color:white;border:3px solid white;padding:12px 24px;border-radius:50px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,0.3);transition:all 0.3s ease;text-decoration:none;display:flex;align-items:center;gap:8px;">🌐 <%= lang === 'en' ? 'اردو' : 'English' %></a>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <span class="logo-icon">🚛</span>
+                QuickTow
+            </a>
+            <div class="navbar-links">
+                <a href="/booking"><%= t.nav.booking %></a>
+                <a href="/track" class="active"><%= t.nav.track %></a>
+                <a href="/blogs"><%= t.nav.blogs %></a>
+                <a href="/about"><%= t.nav.about %></a>
+                <a href="/booking" class="cta"><%= t.nav.emergency %></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tracking-hero">
+        <h1>📍 <%= t.tracking.title %></h1>
+        <p><%= t.tracking.subtitle %></p>
+        <form action="/track" method="POST" class="tracking-search">
+            <input type="text" name="tracking_code" placeholder="<%= t.tracking.placeholder %>" value="<%= code %>" required>
+            <button type="submit" class="btn btn-primary"><%= t.tracking.button %></button>
+        </form>
+    </div>
+
+    <div class="container">
+        <% if(error) { %>
+            <div class="alert alert-error" style="max-width: 650px; margin: 0 auto;">
+                ⚠️ <%= error %>
+            </div>
+        <% } %>
+
+        <% if(booking) { %>
+            <div class="tracking-result">
+                <div class="tracking-info-grid">
+                    <div class="tracking-detail-card">
+                        <h4>📋 <%= t.tracking.booking_details %></h4>
+                        <div class="value"><%= booking.customer_name %></div>
+                        <p style="color: var(--text-light); margin-top: 6px;"><%= booking.car_model %></p>
+                        <p style="color: var(--text-light);">📞 <%= booking.phone %></p>
+                    </div>
+                    <div class="tracking-detail-card">
+                        <h4>📊 <%= t.tracking.current_status %></h4>
+                        <div class="value">
+                            <span class="badge badge-<%= booking.status %>">
+                                <% if(booking.status === 'pending') { %> ⏳ Pending
+                                <% } else if(booking.status === 'assigned') { %> 👨‍✈️ Driver Assigned
+                                <% } else if(booking.status === 'dispatched') { %> 🚛 Dispatched
+                                <% } else if(booking.status === 'on_the_way') { %> 🛣️ On The Way
+                                <% } else if(booking.status === 'arrived') { %> 📍 Arrived
+                                <% } else if(booking.status === 'completed') { %> ✅ Completed
+                                <% } else if(booking.status === 'cancelled') { %> ❌ Cancelled
+                                <% } %>
+                            </span>
+                        </div>
+                        <p style="color: var(--text-light); margin-top: 10px;">Tracking: <strong style="color: var(--primary);"><%= booking.tracking_code %></strong></p>
+                    </div>
+                    <div class="tracking-detail-card">
+                        <h4>📍 <%= t.tracking.pickup %></h4>
+                        <div class="value"><%= booking.pickup_location %></div>
+                    </div>
+                    <div class="tracking-detail-card">
+                        <h4>🏁 <%= t.tracking.dropoff %></h4>
+                        <div class="value"><%= booking.dropoff_location %></div>
+                    </div>
+                </div>
+
+                <% if(booking.driver_name) { %>
+                    <div class="tracking-detail-card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent);">
+                        <h4>👨‍✈️ <%= t.tracking.assigned_driver %></h4>
+                        <div style="display: flex; align-items: center; gap: 1.25rem; margin-top: 0.75rem;">
+                            <div class="driver-avatar" style="width: 65px; height: 65px; font-size: 2rem;">🚛</div>
+                            <div>
+                                <div class="value" style="font-size: 1.2rem;"><%= booking.driver_name %></div>
+                                <p style="color: var(--text-light); margin-top: 4px;">📞 <%= booking.driver_phone %> | 🚗 <%= booking.truck_number %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <div class="map-container">
+                    <h3 style="padding: 1.25rem 1.75rem 0; font-weight: 700;">🗺️ <%= t.tracking.live_location %></h3>
+                    <div id="tracking-map" data-booking-id="<%= booking.id %>" 
+                         data-driver-lat="<%= booking.location_lat || '' %>" 
+                         data-driver-lng="<%= booking.location_lng || '' %>"
+                         data-pickup="<%= booking.pickup_location %>"
+                         data-dropoff="<%= booking.dropoff_location %>">
+                        Loading map...
+                    </div>
+                </div>
+
+                <% if(typeof history !== 'undefined' && history.length > 0) { %>
+                    <div class="timeline">
+                        <h3>📜 <%= t.tracking.status_history %></h3>
+                        <% history.forEach(function(h, index) { %>
+                            <div class="timeline-item" style="animation-delay: <%= index * 0.1 %>s;">
+                                <div class="timeline-dot">📌</div>
+                                <div class="timeline-content">
+                                    <div class="status-text"><%= h.status.replaceAll('_', ' ').toUpperCase() %></div>
+                                    <div class="time"><%= new Date(h.created_at).toLocaleString() %></div>
+                                    <% if(h.note) { %>
+                                        <div class="note"><%= h.note %></div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        <% } else if(!error) { %>
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3><%= t.tracking.enter_code %></h3>
+                <p><%= t.tracking.enter_code_desc %></p>
+            </div>
+        <% } %>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const mapDiv = document.getElementById('tracking-map');
+        let map = null;
+        let driverMarker = null;
+
+        function initMap(lat, lng) {
+            if (!map) {
+                map = L.map('tracking-map').setView([lat, lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                driverMarker = L.marker([lat, lng]).addTo(map).bindPopup('🚛 Tow Truck Location').openPopup();
+            } else {
+                map.setView([lat, lng], 13);
+                if (driverMarker) {
+                    driverMarker.setLatLng([lat, lng]);
+                } else {
+                    driverMarker = L.marker([lat, lng]).addTo(map).bindPopup('🚛 Tow Truck Location').openPopup();
+                }
+            }
+        }
+
+        if (mapDiv && mapDiv.dataset.driverLat && mapDiv.dataset.driverLng) {
+            const lat = parseFloat(mapDiv.dataset.driverLat);
+            const lng = parseFloat(mapDiv.dataset.driverLng);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                initMap(lat, lng);
+
+                // Auto refresh location every 10 seconds
+                setInterval(async () => {
+                    try {
+                        const bookingId = mapDiv.dataset.bookingId;
+                        const res = await fetch('/api/driver-location/' + bookingId);
+                        const data = await res.json();
+                        if (data && data.location_lat && data.location_lng) {
+                            const newLat = parseFloat(data.location_lat);
+                            const newLng = parseFloat(data.location_lng);
+                            if (!isNaN(newLat) && !isNaN(newLng)) {
+                                initMap(newLat, newLng);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Error fetching location:', err);
+                    }
+                }, 10000);
+            }
+        } else if (mapDiv) {
+            mapDiv.innerHTML = '<p style="padding: 2rem; text-align: center;">🗺️ <%= t.tracking.map_hint %></p>';
+        }
+    </script>
+
+    <footer class="footer">
+        <p>&copy; <%= t.footer.copyright %></p>
+    </footer>
+
+</body>
+</html>

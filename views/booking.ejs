@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Tow Truck | QuickTow</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <% if (lang === 'ur') { %>
+    <style>body { direction: rtl; text-align: right; } .navbar-brand { flex-direction: row-reverse; } .navbar-links { flex-direction: row-reverse; } .tracking-search { flex-direction: row-reverse; }</style>
+    <% } %>
+</head>
+<body>
+<a href="?lang=<%= langSwitch %>" class="lang-btn" style="position:fixed;top:90px;right:25px;z-index:9999;background:linear-gradient(135deg,#f39c12,#e67e22);color:white;border:3px solid white;padding:12px 24px;border-radius:50px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,0.3);transition:all 0.3s ease;text-decoration:none;display:flex;align-items:center;gap:8px;">🌐 <%= lang === 'en' ? 'اردو' : 'English' %></a>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <span class="logo-icon">🚛</span>
+                QuickTow
+            </a>
+            <div class="navbar-links">
+                <a href="/booking" class="active"><%= t.nav.booking %></a>
+                <a href="/track"><%= t.nav.track %></a>
+                <a href="/blogs"><%= t.nav.blogs %></a>
+                <a href="/about"><%= t.nav.about %></a>
+                <a href="/booking" class="cta"><%= t.nav.emergency %></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1><%= t.hero.title1 %></h1>
+        <p><%= t.hero.subtitle %></p>
+    </div>
+
+    <div class="booking-wrapper">
+        <div class="booking-card">
+            
+            <% if(typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-error">
+                    ⚠️ <%= error %>
+                </div>
+            <% } %>
+            <% if(typeof success !== 'undefined' && success) { %> 
+                <div class="alert alert-success">
+                    ✅ <%= success %>
+                </div>
+                <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 25px; border-radius: 16px; text-align: center; margin-bottom: 2rem; border: 2px solid var(--accent);">
+                    <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 10px; font-weight: 500;"><%= t.booking.your_code %></p>
+                    <p style="font-size: 2.5rem; font-weight: 900; color: var(--primary); letter-spacing: 4px; text-shadow: 0 2px 10px rgba(243, 156, 18, 0.2);"><%= typeof trackingCode !== 'undefined' ? trackingCode : '' %></p>
+                    <a href="/track" style="color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font-size: 1.05rem; transition: all 0.3s ease;"><%= t.booking.track_order %></a>
+                </div>
+            <% } %>
+
+            <h2><%= t.booking.title %></h2>
+            <p class="subtitle"><%= t.booking.subtitle %></p>
+
+            <form action="/book" method="POST" id="bookingForm">
+                <div class="form-group">
+                    <label><%= t.booking.name %></label>
+                    <input type="text" class="form-control" name="customer_name" placeholder="<%= t.booking.name_ph %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label><%= t.booking.phone %></label>
+                    <input type="tel" class="form-control" name="phone" placeholder="<%= t.booking.phone_ph %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label><%= t.booking.vehicle %></label>
+                    <input type="text" class="form-control" name="car_model" placeholder="<%= t.booking.vehicle_ph %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label><%= t.booking.pickup %></label>
+                    <input type="text" class="form-control" name="pickup_location" placeholder="<%= t.booking.pickup_ph %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label><%= t.booking.dropoff %></label>
+                    <input type="text" class="form-control" name="dropoff_location" placeholder="<%= t.booking.dropoff_ph %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label><%= t.booking.truck_type %></label>
+                    <div class="truck-grid">
+                        <label class="truck-option">
+                            <input type="radio" name="service_type" value="standard" checked>
+                            <div class="truck-card">
+                                <div class="truck-icon">🚛</div>
+                                <div class="truck-name"><%= t.booking.standard %></div>
+                                <div class="truck-desc"><%= t.booking.standard_desc %></div>
+                            </div>
+                        </label>
+                        <label class="truck-option">
+                            <input type="radio" name="service_type" value="flatbed">
+                            <div class="truck-card">
+                                <div class="truck-icon">🚗</div>
+                                <div class="truck-name"><%= t.booking.flatbed %></div>
+                                <div class="truck-desc"><%= t.booking.flatbed_desc %></div>
+                            </div>
+                        </label>
+                        <label class="truck-option">
+                            <input type="radio" name="service_type" value="accident_recovery">
+                            <div class="truck-card">
+                                <div class="truck-icon">🚑</div>
+                                <div class="truck-name"><%= t.booking.accident %></div>
+                                <div class="truck-desc"><%= t.booking.accident_desc %></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;" id="submitBtn">
+                    <%= t.booking.submit %>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <a href="https://wa.me/923000000000?text=Hello%20QuickTow,%20I%20need%20immediate%20assistance." class="wa-float" target="_blank">
+        💬 WhatsApp Live Chat
+    </a>
+
+    <footer class="footer">
+        <p>&copy; <%= t.footer.copyright %></p>
+    </footer>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '⏳ Dispatching...';
+            btn.disabled = true;
+            btn.classList.add('btn-loading');
+        });
+    </script>
+
+</body>
+</html>

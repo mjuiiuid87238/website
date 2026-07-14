@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Login | QuickTow</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <% if (lang === 'ur') { %>
+    <style>body { direction: rtl; text-align: right; } .navbar-brand { flex-direction: row-reverse; } .navbar-links { flex-direction: row-reverse; } .tracking-search { flex-direction: row-reverse; }</style>
+    <% } %>
+</head>
+<body>
+<a href="?lang=<%= langSwitch %>" class="lang-btn" style="position:fixed;top:90px;right:25px;z-index:9999;background:linear-gradient(135deg,#f39c12,#e67e22);color:white;border:3px solid white;padding:12px 24px;border-radius:50px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,0.3);transition:all 0.3s ease;text-decoration:none;display:flex;align-items:center;gap:8px;">🌐 <%= lang === 'en' ? 'اردو' : 'English' %></a>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-icon">👨‍✈️</div>
+            <h2><%= t.driver.title %></h2>
+            <p class="subtitle"><%= t.driver.subtitle %></p>
+
+            <% if(error) { %> 
+                <div class="alert alert-error">
+                    ⚠️ <%= error %>
+                </div>
+            <% } %>
+
+            <form action="/driver/login" method="POST" id="driverLoginForm">
+                <div class="form-group">
+                    <label><%= t.driver.phone %></label>
+                    <input type="tel" class="form-control" name="phone" placeholder="<%= t.driver.phone_ph %>" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">
+                    <%= t.driver.sign_in %>
+                </button>
+            </form>
+
+            <p style="margin-top: 2rem; color: var(--text-light); font-size: 0.95rem;">
+                <a href="/" style="color: var(--text-light); text-decoration: none; font-weight: 500;"><%= t.nav.back_home %></a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('driverLoginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '⏳ Signing in...';
+            btn.disabled = true;
+        });
+    </script>
+
+</body>
+</html>
